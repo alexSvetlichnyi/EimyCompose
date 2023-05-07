@@ -2,11 +2,23 @@ package com.example.myapplication.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,11 +45,9 @@ fun GameScreenLayout(gameViewModel: GameViewModel = viewModel()) {
     
     val myScoreState: Int? by myLiveData.observeAsState()
 
-    // Use the state variable in your Composable
-
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         LazyColumn(
-            contentPadding = PaddingValues(8.dp),
+            contentPadding = PaddingValues(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(GameViewModel.ROW_COUNT) { row ->
@@ -48,7 +58,7 @@ fun GameScreenLayout(gameViewModel: GameViewModel = viewModel()) {
                     for (column in gridCells[0].indices) {
                         Box(
                             Modifier
-                                .size(25.dp)
+                                .weight(1f)
                                 .aspectRatio(1.0F)
                                 .padding(1.dp)
                                 .background(if (gridCells[row][column]) Color.Red else Color.Gray)
@@ -65,7 +75,7 @@ fun GameScreenLayout(gameViewModel: GameViewModel = viewModel()) {
         Spacer(modifier = Modifier.height(32.dp))
 
         myScoreState?.let { score ->
-            Text(text = "Selected items: $score")
+            Text(text = "Biggest Rectangle: $score")
         }
     }
 }
