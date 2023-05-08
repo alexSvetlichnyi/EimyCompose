@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,11 +32,11 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 @Composable
 fun GameScreenLayout(gameViewModel: GameViewModel = viewModel()) {
     val gridCells = remember {
-        mutableStateListOf<MutableList<Boolean>>().apply {
+        mutableStateListOf<MutableList<State>>().apply {
             for (i in 0 until GameViewModel.ROW_COUNT) {
-                add(mutableStateListOf<Boolean>().apply {
+                add(mutableStateListOf<State>().apply {
                     for (j in 0 until GameViewModel.COLUMN_COUNT) {
-                        add(false)
+                        add(State.UNSELECTED)
                     }
                 })
             }
@@ -61,9 +62,19 @@ fun GameScreenLayout(gameViewModel: GameViewModel = viewModel()) {
                                 .weight(1f)
                                 .aspectRatio(1.0F)
                                 .padding(1.dp)
-                                .background(if (gridCells[row][column]) Color.Red else Color.Gray)
+                                .background(
+                                    when (gridCells[row][column]) {
+                                        State.HIGHLIGHTED -> Color.Red
+                                        State.UNSELECTED -> Color.LightGray
+                                        State.SELECTED -> Color.Gray
+                                    }
+                                )
                                 .clickable(onClick = {
-                                    gridCells[row][column] = !gridCells[row][column]
+                                    if (gridCells[row][column] == State.UNSELECTED) {
+                                        gridCells[row][column] = State.SELECTED
+                                    } else {
+                                        gridCells[row][column] = State.UNSELECTED
+                                    }
                                     gameViewModel.calculateBiggestScore(gridCells)
                                 })
                         )
@@ -77,6 +88,19 @@ fun GameScreenLayout(gameViewModel: GameViewModel = viewModel()) {
         myScoreState?.let { score ->
             Text(text = "Biggest Rectangle: $score")
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        Button(onClick = {
+            for (i in gridCells.indices) {
+                for (j in gridCells[0].indices) {
+                    gridCells[i][j] = State.UNSELECTED
+                    gameViewModel.resetScore()
+                }
+            }
+        }) {
+            Text(text = "Reset")
+        }
     }
 }
 
@@ -86,4 +110,10 @@ fun DefaultPreview() {
     MyApplicationTheme {
         GameScreenLayout()
     }
+}
+
+enum class State {
+    UNSELECTED,
+    SELECTED,
+    HIGHLIGHTED
 }
